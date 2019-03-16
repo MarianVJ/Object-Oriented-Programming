@@ -1,0 +1,118 @@
+				README
+	
+					JORASCU MARIAN VLADUT 
+					GRUPA 325 CD
+
+
+Inainte de a incepe prezentarea modului de implementare a temei 
+MENTIONEZ FAPTUL CA AM IMPLEMENTAT BONUSUL.
+
+
+DESCRIEREA STRUCTURII SI A CLASELOR
+Proiectul contine 3 pachete : main , eroi si modifiers.
+Proiectul eroi contine clasa Hero , o clasa parinte pe care o mostenesc
+toate celelalte 4 clase Rogue, Wizard, Knight si Pyromancer. Clasa Hero
+contine informatii comune pe care toti eroii le au precum viata , 
+viata maxima,nivelul curent. Metodele sunt atat gettere si settere pentru 
+a seta campurile fiecarui erou in parte in conformitate cu rasa sa, dar exista
+si anumite metode care actualizeaza  proprietatile eroilor ( level ,
+experienta , viata maxima , viata curenta ) atunci cand un erou sare 
+la un nou nivel. De asemenea clasa erou contine o metoda damagedBy 
+care este metoda "accept" din Double Dispatch , cu ajutorul careia
+reusesc sa fac eroii sa interactioneze intre ei fara a mai folosi instanceof.
+
+PREZENTARE FIECARE CLASA PARTICULARA IN PARTE
+
+*Clasa Pyromancer are o serie de variabile de tip static final , care sunt
+caracteristice pentru fiecare erou de tip Pyromancer , caracteristici necesare
+in stabilirea starii initiale a eroului dar si in updatarea anumitor 
+proprietati pe tot parcursul desfasurarii jocului. Suprascrie metoda
+updateDamage care se apeleaza de fiecare data cand eroul nostru
+a mai crescut un nivel/sau mai multe din cadrul
+clasei erou. Si care seteaza nivelul
+damage-urilor in conformitate cu levelul actual. De asemenea exista cate 
+o metoda pentru fiecare abilitate a sa : atat pentru Ignite cat si pentru
+Fireblast , care calculeaza damage-ul pentru oponent in functie de 
+terenul pe care se desfasoara lupta si de raceModifierul adversarului
+care este dat ca parametru.De asemenea exista si o functie care
+calculeaza damage-ul overtime de care adeversarul va suferi. Clasa 
+Pyromancer suprascrie metoda damageBy ( prin care obiectele reusesc sa 
+interactioneze intre ele evitand folosirea instanceofurilor- DOUBLE DISPATCH)
+. Ultimele metode poarta toate numele de "damage" si sunt apelate din metoda
+damagedBy , fiecare avand un tip de argument diferit ( Knight Pyromancer etc).
+Aceste 4 functii care fac parte din Double Dispatch sunt similare 
+In cadrul fiecareia se seteaza adversarului parametrii Overtime , dupa 
+care se calculeaza damage-ul din runda curenta cu ajutorul functiilor pe care
+le-am enuntat anterior si se returneaza Damage-ul total rotunjit.
+
+PENTRU CELELALTE 3 clase voi descrie doar metodele particulare care sunt
+implementate
+
+*Clasa Rogue are cate o metoda pentru fiecare abilitate a sa : Backstab si
+Paralysis care calculeaza damage-ul pentru oponent in functie de terenul pe
+care se desfasoara lupta si de raceModifierul care este dat ca parametru.
+In cadrul acestei clase metoda damages seteaza parametrii overtime
+pentru adversar ( numarul de runde si damage-ul efectiv) , Calculeaza 
+damage-ul pe care oponentul il primeste in runda curenta si ii seteaza 
+un anumit numar de runde statice , in care acesta nu se va putea misca pe 
+harta cu ajutorul unei metode in functie de terenul pe care se desfasoara
+lupta.
+
+*Clasa Knight are cate o metoda pentru fiecare abilitate a sa : Execute 
+care calcuuleaza damage-ul pentru adversar in fuctie de rasa sa , teren
+dar si de viata pe care oponentul o are la momentul luptei , si abilitatea
+Slam. Metoda Damages returneaza damage-ul date adversarului in runda 
+actuala si ii seteaza numarul de runde statice , in care acesta ramane
+nemiscat pe harta.
+
+*Clasa Wizard la fel ca celelalte clase are 2 metode pentru fiecare abilitate 
+Deflect si Drain.Metoda Damages returneaza damage-ul oferit oponentului.
+
+Toate cele 4 clase au cate 2 vectori statici in care sunt stocati 
+modificatorii de rasa pentru fiecare rasa ,
+in mod  particular pentru fiecare 
+vraja. Acest lucru este efectuat cu ajutorul *clasei Modifiers din pachetul
+modifiers.
+
+*Clasa Game este cea in care se realizeaza propriuzis desfasurarea
+jocului. Aceasta clasa contine membrii in care se retin de fiecare data
+datele esentiale pentru desfasurarea jocului ( numarul de linii si coloane
+ale hartii in 2 variabile , harta se retine cu ajutorul unei matrice de 
+charuri in care sunt stoate initialele landurilor ; un vector de caractere
+in care se retine initiala fiecarui erou in ordinea citita etc)
+,dar se efectueaza de asemenea
+si citirea si scrierea ( mai multe detalii despre aceasta clasa la modul
+de executie al jocului dar si in Comentariile din cod). 
+
+*Clasa Main contine un obiect de tip Game. In cadrul acestei clase
+se apeleaza metodele de citire si scriere in fisier. Si metoda de incepere
+a jocului .
+
+
+MODUL DE DESFASURARE A UNUI MECI
+
+La instantierea obiectului de tip Game in clasa Main , acesta primeste
+ca parametru fisierul de citire si se citesc toate datele necesare.
+Dupa care se instantiaza fiecare erou. Pentru a retine mai usor eroii
+am folosit un vector de tip Hero. Clasa Game contine metoda startJoc() in care
+se desfasoara jocul. Inainte de inceperea fiecarei runde se actualizeaza 
+pozitiile fiecarui erou pe harta folosing o metoda 
+actualizarePozitii(nrRundaCurenta), iar mai apoi inainte ca eroii sa se
+lupte se verifica daca exista personaje care sufera in urma unei abilitati 
+Overtime.  Odata verificate aceste 2 lucruri iteram prin vectorul nostru de
+eroi si verificam daca exista personaje care se afla in aceeasi locatia 
+, caz in care acestia se vor lupta. Calculam cu ajutorul functiilor 
+damageDby damage-ul primit de fiecare erou din partea celuilalt
+Iar mai apoi actualizam viata fiecaruia folosind metoda updateHeroesStatus.
+In cadrul acestei functii nu doar ca se actualizeaza vietile eroilor
+dar se verifica si daca unul dintre ei moare , si ii se seteaza un deadCode
+pentru a sti in meci ca acel personaj nu mai traieste, iar celalt
+jucator daca mai este in viata primeste experienta cuvenita si in cadrul unor 
+metode din clasa Hero ( updateHeroslevel) se verifica daca acesta
+indeplineste conditiile necesare cresterii in level , iar mai apoi 
+daca acesta ccreste nivelul se apeleaza inlantuite si functiile pentru a
+updata damage-ul  abilitatilor , viata si viata maxima. Dupa un anumit numar
+de runde meciul se termina si se paraseste functia.
+Metoda scriere(String fisier) are ca argument fisierul in care de doreste scrierea datelor
+Parcurgem vectorul de eroi , element cu element si scriem conform cerintei
+datele finale ale meciului.
